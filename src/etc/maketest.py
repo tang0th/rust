@@ -26,31 +26,35 @@ def normalize_path(v):
 
 
 def putenv(name, value):
+    print('    putenv: ' + name + ',' + value);
     if os.name == 'nt':
         value = normalize_path(value)
     os.putenv(name, value)
 
-def convert_path_spec(name_and_value):
-    name = name_and_value.split('=')[0]
-    value = name_and_value.split('=')[1]
+def convert_path_spec(name, value):
+    print('    convert_path_spec: ' + name + ',' + value);
     if os.name == 'nt' and name != 'PATH':
         value = ":".join(normalize_path(v) for v in value.split(";"))
-    return (name, value)
+    return value
 
-def put_delayed_env_setting(carrier_name, setting):
-    if setting != '':
-        delayed_name, value = convert_path_spec(setting)
+def put_delayed_env_setting(carrier_name, delayed_name, addition):
+    print('    put_delayed_env_setting: ' + carrier_name + "," + delayed_name + "," + addition);
+    if addition != '':
+        setting = '"' + '$$' + delayed_name + ':' + addition + '"'
+        value = convert_path_spec(delayed_name, setting)
         os.putenv(carrier_name, delayed_name + '=' + value)
 
+print('  entered maketest.py');
 make = sys.argv[2]
 putenv('RUSTC', os.path.abspath(sys.argv[3]))
 putenv('TMPDIR', os.path.abspath(sys.argv[4]))
 putenv('CC', sys.argv[5])
 putenv('RUSTDOC', os.path.abspath(sys.argv[6]))
 filt = sys.argv[7]
-put_delayed_env_setting('HOST_RPATH_ENV', sys.argv[8])
-put_delayed_env_setting('TARGET_RPATH_ENV', sys.argv[9])
-putenv('RUST_BUILD_STAGE', sys.argv[10])
+ldlibpath_envvar = sys.argv[8]
+put_delayed_env_setting('HOST_RPATH_ENV', ldlibpath_envvar, sys.argv[9])
+put_delayed_env_setting('TARGET_RPATH_ENV', ldlibpath_envvar, sys.argv[10])
+putenv('RUST_BUILD_STAGE', sys.argv[11])
 
 if not filt in sys.argv[1]:
     sys.exit(0)

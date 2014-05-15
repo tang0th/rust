@@ -963,6 +963,7 @@ $(3)/test/run-make/%-$(1)-T-$(2)-H-$(3).ok: \
 		$$(CSREQ$(1)_T_$(2)_H_$(3))
 	@rm -rf $(3)/test/run-make/$$*
 	@mkdir -p $(3)/test/run-make/$$*
+	echo "$$(HOST_RPATH_VAR$(1)_T_$(2)_H_$(3))" "$$(TARGET_RPATH_VAR$(1)_T_$(2)_H_$(3))"
 	$$(Q)$$(CFG_PYTHON) $(S)src/etc/maketest.py $$(dir $$<) \
         $$(MAKE) \
 	    $$(HBIN$(1)_H_$(3))/rustc$$(X_$(3)) \
@@ -970,8 +971,9 @@ $(3)/test/run-make/%-$(1)-T-$(2)-H-$(3).ok: \
 	    "$$(CC_$(3)) $$(CFG_GCCISH_CFLAGS_$(3))" \
 	    $$(HBIN$(1)_H_$(3))/rustdoc$$(X_$(3)) \
 	    "$$(TESTNAME)" \
-	    "$$(HOST_RPATH_VAR$(1)_T_$(2)_H_$(3))" \
-	    "$$(TARGET_RPATH_VAR$(1)_T_$(2)_H_$(3))" \
+            $$(LD_LIBRARY_PATH_ENV_NAME$(1)_T_$(2)_H_$(3)) \
+            "$$(LD_LIBRARY_PATH_ENV_HOSTDIR$(1)_T_$(2)_H_$(3))" \
+            "$$(LD_LIBRARY_PATH_ENV_TARGETDIR$(1)_T_$(2)_H_$(3))" \
 	    $(1)
 	@touch $$@
 else
